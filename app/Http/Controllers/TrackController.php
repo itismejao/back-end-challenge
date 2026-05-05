@@ -3,14 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Domain\Integration\Jobs\FetchTrackByIsrcJob;
-use App\Domain\Music\Contracts\TrackQueryInterface;
 use App\Domain\Music\Cache\TrackListingCache;
+use App\Domain\Music\Contracts\TrackQueryInterface;
 use App\Http\Resources\TrackResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+
 class TrackController extends Controller
 {
-    public function index(Request $request, TrackQueryInterface $trackQuery)
+    public function index(Request $request, TrackQueryInterface $trackQuery): JsonResponse
     {
         $validated = $request->validate([
             'market' => ['required', 'string', 'size:2'],
@@ -21,11 +22,13 @@ class TrackController extends Controller
 
         $cacheKey = 'tracks:' . md5($request->fullUrl());
 
-        return TrackListingCache::remember($cacheKey, function () use ($validated, $trackQuery) {
+        $data = TrackListingCache::remember($cacheKey, function () use ($validated, $trackQuery) {
             $tracks = $trackQuery->paginate($validated);
 
-            return TrackResource::collection($tracks);
+            return TrackResource::collection($tracks)->response()->getData(true);
         });
+
+        return response()->json($data);
     }
 
     public function fetch(Request $request): JsonResponse
