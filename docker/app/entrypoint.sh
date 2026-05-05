@@ -48,6 +48,15 @@ mkdir -p /var/www/bootstrap/cache
 
 # ─── Run migrations if DB is available ───
 if [ "${RUN_MIGRATIONS:-false}" = "true" ]; then
+    echo "Creating testing database..."
+    php -r "
+        \$dbName = getenv('DB_TEST_DATABASE') ?: 'onerpm_testing';
+        \$user = getenv('DB_USERNAME');
+        \$pdo = new PDO('mysql:host=' . getenv('DB_HOST') . ';port=' . getenv('DB_PORT'), 'root', getenv('DB_ROOT_PASSWORD'));
+        \$pdo->exec('CREATE DATABASE IF NOT EXISTS ' . \$dbName);
+        \$pdo->exec(\"GRANT ALL PRIVILEGES ON \$dbName.* TO '\$user'@'%'\");
+        \$pdo->exec('FLUSH PRIVILEGES');
+    " 2>/dev/null || true
     echo "Running migrations..."
     php /var/www/artisan migrate --force --no-interaction 2>/dev/null || true
     echo "Running seeders..."
