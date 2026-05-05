@@ -53,6 +53,12 @@ if [ "${RUN_MIGRATIONS:-false}" = "true" ]; then
     echo "Running seeders..."
     php /var/www/artisan db:seed --class=CountrySeeder --force --no-interaction 2>/dev/null || true
     php /var/www/artisan db:seed --class=ProviderSeeder --force --no-interaction 2>/dev/null || true
+    echo "Importing tracks..."
+    php /var/www/artisan tracks:fetch \
+        NO1R42509310 NO1R42511410 BRC310600002 BR1SP1200071 BR1SP1200070 \
+        BR1SP1500002 BXKZM1900338 BXKZM1900345 QZNJX2081700 QZNJX2078148 \
+        --markets=BR,US,GB 2>/dev/null || true
+
 fi
 
 # ─── Execute the main command ───
