@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Domain\Music\Observers;
+namespace Music\Observers;
 
-use App\Domain\Music\Models\Track;
-use App\Domain\Music\Observers\Concerns\FlushesTrackListingCache;
+use Music\Models\Track;
+use Music\Observers\Concerns\FlushesTrackListingCache;
 
 class TrackObserver
 {

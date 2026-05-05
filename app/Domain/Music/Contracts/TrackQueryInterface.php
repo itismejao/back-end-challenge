@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domain\Music\Contracts;
+namespace Music\Contracts;
 
 use Illuminate\Contracts\Pagination\CursorPaginator;
 

@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Domain\Music\Models;
+namespace Music\Models;
 
-use App\Domain\Integration\Models\ArtistExternalId;
+use Integration\Models\ArtistExternalId;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;

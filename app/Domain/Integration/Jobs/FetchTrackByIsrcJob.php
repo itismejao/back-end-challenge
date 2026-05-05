@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Domain\Integration\Jobs;
+namespace Integration\Jobs;
 
-use App\Domain\Integration\Contracts\MusicProviderFactoryInterface;
-use App\Domain\Integration\Services\TrackIngestionService;
+use Integration\Contracts\MusicProviderFactoryInterface;
+use Integration\Services\TrackIngestionService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;

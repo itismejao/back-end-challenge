@@ -23,13 +23,18 @@
     "autoload": {
         "psr-4": {
             "App\\": "app/",
+            "Music\\": "app/Domain/Music/",
+            "Integration\\": "app/Domain/Integration/",
+            "Shared\\": "app/Domain/Shared/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Tests\\": "tests/"
+            "Tests\\": "tests/",
+            "Music\\Tests\\": "app/Domain/Music/Tests/",
+            "Integration\\Tests\\": "app/Domain/Integration/Tests/"
         }
     },
     "scripts": {

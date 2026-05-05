@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Domain\Integration\Observers;
+namespace Integration\Observers;
 
-use App\Domain\Integration\Models\TrackExternalId;
-use App\Domain\Music\Observers\Concerns\FlushesTrackListingCache;
+use Integration\Models\TrackExternalId;
+use Music\Observers\Concerns\FlushesTrackListingCache;
 
 class TrackExternalIdObserver
 {

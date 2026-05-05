@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Domain\Integration\Services;
+namespace Integration\Services;
 
-use App\Domain\Integration\Contracts\MusicProviderInterface;
-use App\Domain\Integration\DTOs\ArtistDTO;
-use App\Domain\Integration\DTOs\TrackDTO;
-use App\Domain\Integration\Models\TrackExternalId;
-use App\Domain\Music\Contracts\AlbumRepositoryInterface;
-use App\Domain\Music\Contracts\ArtistRepositoryInterface;
-use App\Domain\Music\Contracts\TrackRepositoryInterface;
-use App\Domain\Music\Models\Album;
-use App\Domain\Music\Models\Artist;
-use App\Domain\Music\Models\Track;
-use App\Domain\Music\Cache\TrackListingCache;
+use Integration\Contracts\MusicProviderInterface;
+use Integration\DTOs\ArtistDTO;
+use Integration\DTOs\TrackDTO;
+use Integration\Models\TrackExternalId;
+use Music\Contracts\AlbumRepositoryInterface;
+use Music\Contracts\ArtistRepositoryInterface;
+use Music\Contracts\TrackRepositoryInterface;
+use Music\Models\Album;
+use Music\Models\Artist;
+use Music\Models\Track;
+use Music\Cache\TrackListingCache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 

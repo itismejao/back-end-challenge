@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Domain\Integration\Services;
+namespace Integration\Services;
 
-use App\Domain\Integration\Contracts\MusicProviderFactoryInterface;
-use App\Domain\Integration\Contracts\MusicProviderInterface;
+use Integration\Contracts\MusicProviderFactoryInterface;
+use Integration\Contracts\MusicProviderInterface;
 use InvalidArgumentException;
 
 class MusicProviderFactory implements MusicProviderFactoryInterface

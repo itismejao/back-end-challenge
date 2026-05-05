@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domain\Integration\Contracts;
+namespace Integration\Contracts;
 
 interface MusicProviderFactoryInterface
 {

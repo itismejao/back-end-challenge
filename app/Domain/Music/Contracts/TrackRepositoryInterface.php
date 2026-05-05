@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Domain\Music\Contracts;
+namespace Music\Contracts;
 
-use App\Domain\Music\Models\Album;
-use App\Domain\Music\Models\Track;
+use Music\Models\Album;
+use Music\Models\Track;
 
 interface TrackRepositoryInterface
 {

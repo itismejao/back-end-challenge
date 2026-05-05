@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domain\Music\Models;
+namespace Music\Models;
 
 use Illuminate\Database\Eloquent\Relations\Pivot;
 

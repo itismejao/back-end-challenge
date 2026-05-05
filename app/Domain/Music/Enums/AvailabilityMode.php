@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domain\Music\Enums;
+namespace Music\Enums;
 
 enum AvailabilityMode: string
 {

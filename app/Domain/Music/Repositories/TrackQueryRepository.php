@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Domain\Music\Repositories;
+namespace Music\Repositories;
 
-use App\Domain\Music\Contracts\TrackQueryInterface;
-use App\Domain\Music\Models\Track;
+use Music\Contracts\TrackQueryInterface;
+use Music\Models\Track;
 use Illuminate\Contracts\Pagination\CursorPaginator;
 
 class TrackQueryRepository implements TrackQueryInterface

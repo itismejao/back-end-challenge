@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Domain\Music\Observers\Concerns;
+namespace Music\Observers\Concerns;
 
-use App\Domain\Music\Cache\TrackListingCache;
+use Music\Cache\TrackListingCache;
 
 trait FlushesTrackListingCache
 {

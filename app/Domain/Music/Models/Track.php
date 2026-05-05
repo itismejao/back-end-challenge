@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Domain\Music\Models;
+namespace Music\Models;
 
-use App\Domain\Shared\Models\Country;
-use App\Domain\Integration\Models\TrackExternalId;
-use App\Domain\Music\Enums\AvailabilityMode;
+use Shared\Models\Country;
+use Integration\Models\TrackExternalId;
+use Music\Enums\AvailabilityMode;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;

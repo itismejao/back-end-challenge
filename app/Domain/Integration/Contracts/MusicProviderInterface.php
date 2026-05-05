@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Domain\Integration\Contracts;
+namespace Integration\Contracts;
 
-use App\Domain\Integration\DTOs\TrackDTO;
+use Integration\DTOs\TrackDTO;
 
 interface MusicProviderInterface
 {

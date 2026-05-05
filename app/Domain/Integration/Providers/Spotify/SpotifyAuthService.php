@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domain\Integration\Providers\Spotify;
+namespace Integration\Providers\Spotify;
 
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Cache;

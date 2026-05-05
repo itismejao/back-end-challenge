@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Domain\Integration\Console;
+namespace Integration\Console;
 
-use App\Domain\Integration\Jobs\FetchTrackByIsrcJob;
+use Integration\Jobs\FetchTrackByIsrcJob;
 use Illuminate\Console\Command;
 
 class FetchTracksByIsrcCommand extends Command

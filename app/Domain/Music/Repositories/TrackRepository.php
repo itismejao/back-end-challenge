@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Domain\Music\Repositories;
+namespace Music\Repositories;
 
-use App\Domain\Integration\Models\TrackExternalId;
-use App\Domain\Music\Contracts\TrackRepositoryInterface;
-use App\Domain\Music\Models\Album;
-use App\Domain\Music\Models\Track;
+use Integration\Models\TrackExternalId;
+use Music\Contracts\TrackRepositoryInterface;
+use Music\Models\Album;
+use Music\Models\Track;
 use Illuminate\Database\UniqueConstraintViolationException;
 
 class TrackRepository implements TrackRepositoryInterface

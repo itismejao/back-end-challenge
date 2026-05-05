@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Domain\Music\Models;
+namespace Music\Models;
 
-use App\Domain\Integration\Models\AlbumExternalId;
-use App\Domain\Music\Enums\AlbumType;
-use App\Domain\Music\Enums\ReleaseDatePrecision;
+use Integration\Models\AlbumExternalId;
+use Music\Enums\AlbumType;
+use Music\Enums\ReleaseDatePrecision;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;

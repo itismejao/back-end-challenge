@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domain\Integration\DTOs;
+namespace Integration\DTOs;
 
 final readonly class TrackDTO
 {

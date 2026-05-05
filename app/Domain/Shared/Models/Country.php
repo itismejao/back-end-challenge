@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Domain\Shared\Models;
+namespace Shared\Models;
 
-use App\Domain\Music\Models\Track;
+use Music\Models\Track;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;

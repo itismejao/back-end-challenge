@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Domain\Music\Contracts;
+namespace Music\Contracts;
 
-use App\Domain\Music\Models\Album;
+use Music\Models\Album;
 
 interface AlbumRepositoryInterface
 {

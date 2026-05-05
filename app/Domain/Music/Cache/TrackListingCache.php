@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domain\Music\Cache;
+namespace Music\Cache;
 
 use Illuminate\Support\Facades\Cache;
 

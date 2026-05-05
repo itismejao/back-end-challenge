@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Domain\Music\Repositories;
+namespace Music\Repositories;
 
-use App\Domain\Integration\Models\ArtistExternalId;
-use App\Domain\Music\Contracts\ArtistRepositoryInterface;
-use App\Domain\Music\Models\Artist;
+use Integration\Models\ArtistExternalId;
+use Music\Contracts\ArtistRepositoryInterface;
+use Music\Models\Artist;
 use Illuminate\Database\UniqueConstraintViolationException;
 
 class ArtistRepository implements ArtistRepositoryInterface

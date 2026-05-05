@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Domain\Integration\Providers\Spotify;
+namespace Integration\Providers\Spotify;
 
-use App\Domain\Integration\Contracts\MusicProviderInterface;
-use App\Domain\Integration\DTOs\AlbumDTO;
-use App\Domain\Integration\DTOs\ArtistDTO;
-use App\Domain\Integration\DTOs\TrackDTO;
+use Integration\Contracts\MusicProviderInterface;
+use Integration\DTOs\AlbumDTO;
+use Integration\DTOs\ArtistDTO;
+use Integration\DTOs\TrackDTO;
 use Illuminate\Http\Client\RequestException;
 
 class SpotifyMusicProvider implements MusicProviderInterface

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domain\Integration\Models;
+namespace Integration\Models;
 
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
