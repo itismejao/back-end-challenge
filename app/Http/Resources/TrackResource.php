@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Domain\Music\Enums\AvailabilityMode;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -24,7 +25,7 @@ class TrackResource extends JsonResource
             'explicit' => $this->explicit,
             'disc_number' => $this->disc_number,
             'track_number' => $this->track_number,
-            'available' => $market !== '' && $this->availableMarkets->contains('code', $market),
+            'available' => $this->isAvailable($market),
             'market' => $market,
             'album' => [
                 'name' => $this->album->name,
@@ -41,6 +42,15 @@ class TrackResource extends JsonResource
                 'url' => $spotifyExternalId?->external_url,
             ],
         ];
+    }
+
+    private function isAvailable(string $market): bool
+    {
+        if ($this->availability_mode === AvailabilityMode::Global) {
+            return true;
+        }
+
+        return $market !== '' && $this->availableMarkets->contains('code', $market);
     }
 
     private function formatDuration(int $ms): string
