@@ -5,7 +5,9 @@ namespace Integration\Providers;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Integration\Console\FetchTracksByIsrcCommand;
+use Integration\Contracts\IntegrationLogQueryInterface;
 use Integration\Contracts\MusicProviderFactoryInterface;
+use Integration\Repositories\IntegrationLogQueryRepository;
 use Integration\Models\TrackExternalId;
 use Integration\Observers\TrackExternalIdObserver;
 use Integration\Providers\Spotify\SpotifyAuthService;
@@ -25,6 +27,8 @@ class IntegrationServiceProvider extends ServiceProvider
                 tokenUrl: $config['token_url'],
             );
         });
+
+        $this->app->bind(IntegrationLogQueryInterface::class, IntegrationLogQueryRepository::class);
 
         $this->app->singleton(MusicProviderFactoryInterface::class, function ($app) {
             $factory = new MusicProviderFactory();
