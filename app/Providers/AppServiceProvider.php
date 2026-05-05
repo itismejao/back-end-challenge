@@ -8,9 +8,11 @@ use App\Domain\Integration\Providers\Spotify\SpotifyMusicProvider;
 use App\Domain\Integration\Services\MusicProviderFactory;
 use App\Domain\Music\Contracts\AlbumRepositoryInterface;
 use App\Domain\Music\Contracts\ArtistRepositoryInterface;
+use App\Domain\Music\Contracts\TrackQueryInterface;
 use App\Domain\Music\Contracts\TrackRepositoryInterface;
 use App\Domain\Music\Repositories\AlbumRepository;
 use App\Domain\Music\Repositories\ArtistRepository;
+use App\Domain\Music\Repositories\TrackQueryRepository;
 use App\Domain\Music\Repositories\TrackRepository;
 use Illuminate\Support\ServiceProvider;
 
@@ -21,6 +23,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(ArtistRepositoryInterface::class, ArtistRepository::class);
         $this->app->bind(AlbumRepositoryInterface::class, AlbumRepository::class);
         $this->app->bind(TrackRepositoryInterface::class, TrackRepository::class);
+        $this->app->bind(TrackQueryInterface::class, TrackQueryRepository::class);
 
         $this->app->singleton(SpotifyAuthService::class, function () {
             $config = config('services.spotify');
