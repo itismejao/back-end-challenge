@@ -50,6 +50,8 @@ mkdir -p /var/www/bootstrap/cache
 if [ "${RUN_MIGRATIONS:-false}" = "true" ]; then
     echo "Running migrations..."
     php /var/www/artisan migrate --force --no-interaction 2>/dev/null || true
+    echo "Running seeders..."
+    php /var/www/artisan db:seed --class=CountrySeeder --force --no-interaction 2>/dev/null || true
 fi
 
 # ─── Execute the main command ───
