@@ -73,6 +73,10 @@ class TrackRepository implements TrackRepositoryInterface
     /** @param list<string> $marketCodes */
     private function syncMarkets(Track $track, array $marketCodes): void
     {
-        $track->availableMarkets()->sync($marketCodes);
+        $changes = $track->availableMarkets()->sync($marketCodes);
+
+        if (array_filter($changes)) {
+            $track->touch();
+        }
     }
 }

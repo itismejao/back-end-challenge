@@ -4,10 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Domain\Integration\Jobs\FetchTrackByIsrcJob;
 use App\Domain\Music\Contracts\TrackQueryInterface;
+use App\Domain\Music\Cache\TrackListingCache;
 use App\Http\Resources\TrackResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-
 class TrackController extends Controller
 {
     public function index(Request $request, TrackQueryInterface $trackQuery)
@@ -19,11 +19,13 @@ class TrackController extends Controller
             'per_page' => ['sometimes', 'integer', 'min:1', 'max:100'],
         ]);
 
-        $tracks = $trackQuery->paginate($validated);
+        $cacheKey = 'tracks:' . md5($request->fullUrl());
 
-        TrackResource::withMarket(strtoupper($validated['market']));
+        return TrackListingCache::remember($cacheKey, function () use ($validated, $trackQuery) {
+            $tracks = $trackQuery->paginate($validated);
 
-        return TrackResource::collection($tracks);
+            return TrackResource::collection($tracks);
+        });
     }
 
     public function fetch(Request $request): JsonResponse

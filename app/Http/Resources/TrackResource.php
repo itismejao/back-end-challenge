@@ -7,15 +7,10 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class TrackResource extends JsonResource
 {
-    private static string $market = 'BR';
-
-    public static function withMarket(string $market): void
-    {
-        self::$market = $market;
-    }
-
     public function toArray(Request $request): array
     {
+        $market = strtoupper($request->query('market', ''));
+
         $spotifyExternalId = $this->externalIds
             ->where('provider_code', 'spotify')
             ->first();
@@ -29,8 +24,8 @@ class TrackResource extends JsonResource
             'explicit' => $this->explicit,
             'disc_number' => $this->disc_number,
             'track_number' => $this->track_number,
-            'available' => $this->availableMarkets->contains('code', self::$market),
-            'market' => self::$market,
+            'available' => $market !== '' && $this->availableMarkets->contains('code', $market),
+            'market' => $market,
             'album' => [
                 'name' => $this->album->name,
                 'type' => $this->album->album_type->value,

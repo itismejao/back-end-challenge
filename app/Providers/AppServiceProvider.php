@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use App\Domain\Integration\Contracts\MusicProviderFactoryInterface;
+use App\Domain\Integration\Models\TrackExternalId;
+use App\Domain\Integration\Observers\TrackExternalIdObserver;
 use App\Domain\Integration\Providers\Spotify\SpotifyAuthService;
 use App\Domain\Integration\Providers\Spotify\SpotifyMusicProvider;
 use App\Domain\Integration\Services\MusicProviderFactory;
@@ -10,6 +12,12 @@ use App\Domain\Music\Contracts\AlbumRepositoryInterface;
 use App\Domain\Music\Contracts\ArtistRepositoryInterface;
 use App\Domain\Music\Contracts\TrackQueryInterface;
 use App\Domain\Music\Contracts\TrackRepositoryInterface;
+use App\Domain\Music\Models\Album;
+use App\Domain\Music\Models\Artist;
+use App\Domain\Music\Models\Track;
+use App\Domain\Music\Observers\AlbumObserver;
+use App\Domain\Music\Observers\ArtistObserver;
+use App\Domain\Music\Observers\TrackObserver;
 use App\Domain\Music\Repositories\AlbumRepository;
 use App\Domain\Music\Repositories\ArtistRepository;
 use App\Domain\Music\Repositories\TrackQueryRepository;
@@ -41,11 +49,13 @@ class AppServiceProvider extends ServiceProvider
 
             return $factory;
         });
-
     }
 
     public function boot(): void
     {
-        //
+        Track::observe(TrackObserver::class);
+        Album::observe(AlbumObserver::class);
+        Artist::observe(ArtistObserver::class);
+        TrackExternalId::observe(TrackExternalIdObserver::class);
     }
 }
