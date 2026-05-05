@@ -1,0 +1,50 @@
+# Version control
+.git
+.gitignore
+.gitattributes
+
+# Docker
+docker-compose*.yml
+.dockerignore
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# CI/CD
+.github
+.gitlab-ci.yml
+
+# Documentation
+*.md
+LICENSE
+
+# Testing
+tests
+phpunit.xml
+.phpunit.*
+coverage
+
+# Frontend build tools (handled in multi-stage)
+node_modules
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+storage/logs/*
+*.log
+
+# Cache & temp
+storage/framework/cache/data/*
+storage/framework/sessions/*
+storage/framework/views/*
+bootstrap/cache/*

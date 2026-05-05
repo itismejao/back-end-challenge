@@ -1,0 +1,39 @@
+# =============================================================================
+# One RPM — Docker Compose Override (Development)
+# =============================================================================
+# Automatically loaded by `docker compose up` (without --profile production).
+# Mounts source code, enables hot-reload, and exposes debug ports.
+# =============================================================================
+
+services:
+  app:
+    build:
+      target: base
+    volumes:
+      - .:/var/www
+    command: ["php", "artisan", "octane:start", "--server=swoole", "--host=0.0.0.0", "--port=8000", "--workers=2", "--task-workers=2"]
+    environment:
+      APP_ENV: local
+      APP_DEBUG: "true"
+
+  nginx:
+    ports:
+      - "80:80"
+    volumes:
+      - .:/var/www
+
+  worker:
+    build:
+      target: base
+    volumes:
+      - .:/var/www
+    environment:
+      QUEUE_WORKERS: "2"
+
+  mysql:
+    ports:
+      - "3306:3306"
+
+  redis:
+    ports:
+      - "6379:6379"
