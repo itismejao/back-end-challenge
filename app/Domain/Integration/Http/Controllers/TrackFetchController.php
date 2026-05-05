@@ -2,22 +2,15 @@
 
 namespace Integration\Http\Controllers;
 
+use Integration\Http\Requests\TrackFetchRequest;
 use Integration\Jobs\FetchTrackByIsrcJob;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class TrackFetchController
 {
-    public function __invoke(Request $request): JsonResponse
+    public function __invoke(TrackFetchRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'isrcs' => ['required', 'array', 'min:1', 'max:100'],
-            'isrcs.*' => ['required', 'string', 'size:12'],
-            'provider' => ['sometimes', 'string', 'in:spotify'],
-            'markets' => ['sometimes', 'array'],
-            'markets.*' => ['required', 'string', 'size:2'],
-        ]);
-
+        $validated = $request->validated();
         $provider = $validated['provider'] ?? 'spotify';
         $markets = array_map('strtoupper', $validated['markets'] ?? []);
         $dispatched = [];
