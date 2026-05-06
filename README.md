@@ -1,73 +1,184 @@
-## Início
+# OneRPM - Track Explorer
 
-Bem vindo ao mundo da música!
+Sistema de agregação de metadados de faixas musicais que consome a API do Spotify para buscar, armazenar e exibir informações de tracks por ISRC (International Standard Recording Code).
 
-Atualmente temos a necessidade de consumir os dados de faixas musicais através do código ISRC, que é uma das coisas mais importantes na indústria fonográfica.
+## O que o projeto faz
 
-Segundo [Abramus](https://www.abramus.org.br/musica/isrc/), ISRC (International Standard Recording Code ou Código de Gravação Padrão Internacional) é um padrão internacional de código para identificar de forma única as gravações (faixas).
+- Busca metadados de faixas musicais na API do Spotify a partir de códigos ISRC
+- Armazena artistas, álbums, tracks e seus relacionamentos em banco relacional
+- Verifica disponibilidade das faixas por mercado (país)
+- Exibe as faixas em um frontend Angular com player de preview do Spotify
+- Registra logs de cada integração (sucesso, falha, tempo de execução)
 
-Ele funciona como um código de barras da faixa.
+## Arquitetura
 
+O projeto segue **Domain-Driven Design (DDD)** com três bounded contexts:
 
-## Problema
+```
+app/Domain/
+  Music/          -> Core domain (tracks, álbums, artistas, enums, cache, observers)
+  Integration/    -> Integração com providers externos (Spotify, jobs, logs, DTOs)
+  Shared/         -> Entidades transversais (countries)
+```
 
-Durante o fechamento de contrato com um produtor, foram informados 10 ISRC's que não constam em nossas bases de dados, que seguem abaixo:
+Cada domínio possui seu próprio **ServiceProvider**, rotas, controllers, requests, resources e testes.
 
-* NO1R42509310
-* NO1R42511410
-* BRC310600002
-* BR1SP1200071
-* BR1SP1200070
-* BR1SP1500002
-* BXKZM1900338
-* BXKZM1900345
-* QZNJX2081700
-* QZNJX2078148
+### Padrão Strategy
 
-Precisamos obter e exibir os seguintes dados:
+A integração com providers de música usa o padrão Strategy:
+- `MusicProviderInterface` define o contrato
+- `SpotifyMusicProvider` implementa para o Spotify
+- `MusicProviderFactory` resolve o provider pelo código
+- Para adicionar outro provider (Deezer, Tidal), bastaria criar uma nova classe implementando a interface
 
-* Thumb do álbum
-* Data de lançamento
-* Título da faixa
-* Lista dos artistas da faixa
-* Duração da faixa em minutos e segundos (mm:ss)
-* Player com prévia do áudio
-* Link para a página da faixa no Spotify
-* Sinalização dizendo se a faixa está ou não disponível no Brasil (BR)
+## Serviços (Docker)
 
-Por decisão técnica, temos a necessidade de guardar estas informações em um banco de dados. Para isso, fique livre para criar a estrutura necessária para guardar as informações que achar pertinente das faixas.
+| Serviço | Imagem | Porta | Função |
+|---------|--------|-------|--------|
+| **app** | PHP 8.4 + Swoole | 8000 (interno) | Laravel Octane - API e backend |
+| **nginx** | Nginx 1.27 | 80, 443 | Reverse proxy, serve frontend Angular |
+| **mysql** | MySQL 8.4 | 3306 | Banco de dados relacional |
+| **redis** | Redis 7 | 6379 | Cache, filas e sessões |
+| **worker** | PHP 8.4 + Supervisor | - | Processamento de jobs (fila `integration`) |
 
-Uma vez armazenados os dados, precisamos exibí-los através de uma webpage pública, ordenados por título da faixa de forma alfabética.
+## Pré-requisitos
 
+- Docker e Docker Compose
 
-## Requisitos
+## Como rodar
 
-* Faça um fork deste repositório e abra um PR quando estiver finalizado.
-* O backend deve ser feito no framework Laravel 12.0 ou superior.
-* O banco de dados deve ser MySQL 8 ou superior.
-* O projeto deve rodar em Docker.
-* Use a API do Spotify: [https://developer.spotify.com/](https://developer.spotify.com/) para coletar os dados das faixas.
+### 1. Clone o repositório
 
+```bash
+git clone <repo-url>
+cd one-rpm
+```
 
-## Diferencial
+### 2. Configure o ambiente
 
-* Desenvolver um frontend em Angular.
-* Desenvolver testes unitários e de integração.
+```bash
+cp .env.example .env
+```
 
+Edite o `.env` e preencha:
 
-## O que será avaliado
+```env
+DB_PASSWORD=sua_senha
+DB_ROOT_PASSWORD=sua_senha_root
+SPOTIFY_CLIENT_ID=seu_client_id
+SPOTIFY_CLIENT_SECRET=seu_client_secret
+```
 
-* Fidelidade às instruções.
-* Padrões de projeto.
-* Clean Code e boas práticas.
-* Boas práticas de versionamento.
+### 3. Suba os containers
 
+```bash
+docker compose up -d
+```
 
-## Perfil que buscamos
+O entrypoint automaticamente:
+- Roda as migrations
+- Popula countries (250 países ISO) e providers (Spotify, Apple Music, Deezer, Tidal)
+- Cria o banco de testes (`onerpm_testing`)
+- Importa 10 faixas de exemplo do Spotify com mercados BR, US e GB
 
-* Comunicativo
-* Autodidata
-* Automotivado
-* Curioso
-* Gostar de trabalhar em equipe
-* Compromissado
+### 4. Acesse
+
+- **Frontend:** http://localhost
+- **API:** http://localhost/api/tracks?market=BR
+
+### 5. Rode os testes
+
+```bash
+docker compose exec app php artisan test
+```
+
+Os testes rodam em banco isolado (`onerpm_testing`), sem afetar os dados.
+
+## Páginas do frontend
+
+| URL | Descrição |
+|-----|-----------|
+| `http://localhost/` | **Track Explorer** - Listagem de faixas com filtros (ordenação, mercado), cards com thumb do álbum, duração, artistas, badge de disponibilidade, player Spotify embed |
+| `http://localhost/logs` | **Integration Logs** - Tabela de logs de integração com filtros por status, ISRC e paginação. Click para expandir detalhes de erro |
+
+## Endpoints da API
+
+### `GET /api/tracks`
+
+Listagem paginada (cursor) de faixas.
+
+| Parâmetro | Tipo | Obrigatório | Descrição |
+|-----------|------|-------------|-----------|
+| `market` | string(2) | Sim | Código ISO do país (ex: BR, US) |
+| `order_by` | string | Não | `title`, `duration`, `release_date`, `artist`, `track_number`, `created_at` (default: `title`) |
+| `direction` | string | Não | `asc`, `desc` (default: `asc`) |
+| `per_page` | int | Não | 1-100 (default: 15) |
+
+```bash
+curl "http://localhost/api/tracks?market=BR&order_by=artist&direction=asc&per_page=5"
+```
+
+### `POST /api/tracks/fetch`
+
+Despacha jobs para importar faixas do Spotify.
+
+| Campo | Tipo | Obrigatório | Descrição |
+|-------|------|-------------|-----------|
+| `isrcs` | string[] | Sim | Lista de ISRCs (12 caracteres cada, máx 100) |
+| `provider` | string | Não | Código do provider (default: `spotify`) |
+| `markets` | string[] | Não | Mercados para verificar disponibilidade |
+
+```bash
+curl -X POST "http://localhost/api/tracks/fetch" \
+  -H "Content-Type: application/json" \
+  -d '{"isrcs": ["NO1R42509310"], "markets": ["BR", "US"]}'
+```
+
+### `GET /api/integration/logs`
+
+Listagem paginada (cursor) de logs de integração.
+
+| Parâmetro | Tipo | Obrigatório | Descrição |
+|-----------|------|-------------|-----------|
+| `status` | string | Não | `pending`, `success`, `not_found`, `failed` |
+| `isrc` | string(12) | Não | Filtrar por ISRC |
+| `provider_code` | string | Não | Filtrar por provider |
+| `from` | date | Não | Data inicial |
+| `to` | date | Não | Data final |
+| `per_page` | int | Não | 1-100 (default: 20) |
+
+```bash
+curl "http://localhost/api/integration/logs?status=failed&per_page=10"
+```
+
+## Comando Artisan
+
+```bash
+# Importar faixas por ISRC
+docker compose exec app php artisan tracks:fetch ISRC1 ISRC2 --markets=BR,US,GB
+
+# Usar outro provider
+docker compose exec app php artisan tracks:fetch ISRC1 --provider=spotify --markets=BR
+```
+
+## Testes
+
+```
+65 testes, ~165 assertions
+
+Unit/
+  Music/       -> Enums (AlbumType, AvailabilityMode), TrackResource
+  Integration/ -> DTOs, SpotifyMusicProvider, MusicProviderFactory, TrackIngestionService
+
+Feature/
+  Music/       -> Endpoint GET /api/tracks, Repositories, Cache invalidation (Observers)
+  Integration/ -> Endpoint POST /api/tracks/fetch
+```
+
+## Tecnologias
+
+- **Backend:** PHP 8.4, Laravel 13, Octane (Swoole)
+- **Frontend:** Angular 19, TypeScript
+- **Banco:** MySQL 8.4
+- **Cache/Filas:** Redis 7
+- **Infra:** Docker, Nginx, Supervisor
