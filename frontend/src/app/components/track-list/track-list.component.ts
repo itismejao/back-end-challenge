@@ -1,4 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { TrackService } from '../../services/track.service';
 import { Track, OrderBy, Direction } from '../../models/track.model';
 import { MarketSelectorComponent } from '../market-selector/market-selector.component';
@@ -8,7 +9,7 @@ import { TrackSkeletonComponent } from '../track-skeleton/track-skeleton.compone
 
 @Component({
   selector: 'app-track-list',
-  imports: [MarketSelectorComponent, FiltersComponent, TrackCardComponent, TrackSkeletonComponent],
+  imports: [RouterLink, MarketSelectorComponent, FiltersComponent, TrackCardComponent, TrackSkeletonComponent],
   template: `
     <div class="container">
       <header class="header">
@@ -17,6 +18,7 @@ import { TrackSkeletonComponent } from '../track-skeleton/track-skeleton.compone
           <span class="subtitle">Track Explorer</span>
         </div>
         <div class="header-right">
+          <a routerLink="/logs" class="logs-link">Logs</a>
           <app-filters (filterChange)="onFilterChange($event)" />
           <app-market-selector (marketChange)="onMarketChange($event)" />
         </div>
@@ -65,6 +67,13 @@ import { TrackSkeletonComponent } from '../track-skeleton/track-skeleton.compone
     }
     .header-left { display: flex; align-items: baseline; gap: 12px; }
     .header-right { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+
+    .logs-link {
+      color: #999; text-decoration: none; font-size: 14px;
+      padding: 8px 16px; border: 1px solid #333; border-radius: 8px;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .logs-link:hover { color: #1db954; border-color: #1db954; }
 
     .logo {
       margin: 0; font-size: 28px; font-weight: 800; color: #1db954;

@@ -95,6 +95,7 @@ services:
         condition: service_healthy
     environment:
       QUEUE_WORKERS: "${QUEUE_WORKERS:-4}"
+      RUN_MIGRATIONS: "false"
     command: ["/usr/bin/supervisord", "-n", "-c", "/var/www/docker/app/supervisord.conf"]
     healthcheck:
       test: ["CMD", "php", "/var/www/artisan", "queue:monitor", "default"]

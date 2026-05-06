@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
-import { TrackListComponent } from './components/track-list/track-list.component';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-root',
-  imports: [TrackListComponent],
-  template: '<app-track-list />',
+  imports: [RouterOutlet],
+  template: '<router-outlet />',
   styles: [],
 })
 export class AppComponent {}
