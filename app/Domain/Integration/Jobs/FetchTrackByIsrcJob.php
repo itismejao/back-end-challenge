@@ -4,23 +4,25 @@ namespace Integration\Jobs;
 
 use Illuminate\Http\Client\RequestException;
 use Integration\Contracts\MusicProviderFactoryInterface;
+use Integration\Enums\IntegrationStatus;
 use Integration\Models\IntegrationLog;
 use Integration\Services\TrackIngestionService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\Middleware\WithoutOverlapping;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
+use Symfony\Component\HttpFoundation\Response;
 
 class FetchTrackByIsrcJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public int $tries = 5;
+    private const DEFAULT_RETRY_AFTER_SECONDS = 60;
+    private const RETRY_WINDOW_MINUTES = 60;
 
-    public array $backoff = [5, 15, 30, 60];
+    public int $maxExceptions = 3;
 
     /**
      * @param list<string> $markets
@@ -33,11 +35,9 @@ class FetchTrackByIsrcJob implements ShouldQueue
         $this->onQueue('integration');
     }
 
-    public function middleware(): array
+    public function retryUntil(): \DateTime
     {
-        return [
-            (new WithoutOverlapping($this->providerCode))->releaseAfter(5),
-        ];
+        return now()->addMinutes(self::RETRY_WINDOW_MINUTES);
     }
 
     public function handle(
@@ -50,7 +50,7 @@ class FetchTrackByIsrcJob implements ShouldQueue
         $log = IntegrationLog::create([
             'provider_code' => $this->providerCode,
             'isrc' => $this->isrc,
-            'status' => 'pending',
+            'status' => IntegrationStatus::Pending,
             'attempt' => $this->attempts(),
             'markets' => $this->markets,
             'started_at' => $startedAt,
@@ -61,35 +61,58 @@ class FetchTrackByIsrcJob implements ShouldQueue
 
             $track = $ingestionService->ingest($this->isrc, $provider, $this->markets);
 
-            $finishedAt = now();
-
-            $log->update([
-                'status' => $track ? 'success' : 'not_found',
-                'track_id' => $track?->id,
-                'duration_ms' => (int) $startedAt->diffInMilliseconds($finishedAt),
-                'finished_at' => $finishedAt,
-            ]);
+            $log->markFinished(
+                status: $track ? IntegrationStatus::Success : IntegrationStatus::NotFound,
+                startedAt: $startedAt,
+                trackId: $track?->id,
+            );
 
             if ($track) {
                 Log::info("Track [{$track->name}] ingested successfully for ISRC [{$this->isrc}]");
             }
-        } catch (\Throwable $e) {
-            $finishedAt = now();
+        } catch (RequestException $e) {
+            $log->markFailed($startedAt, $e);
 
-            $log->update([
-                'status' => 'failed',
-                'duration_ms' => (int) $startedAt->diffInMilliseconds($finishedAt),
-                'error_message' => $e->getMessage(),
-                'error_class' => get_class($e),
-                'finished_at' => $finishedAt,
-            ]);
+            if ($this->isRateLimited($e)) {
+                $this->handleRateLimit($e);
+
+                return;
+            }
+
+            throw $e;
+        } catch (\Throwable $e) {
+            $log->markFailed($startedAt, $e);
 
             throw $e;
         }
     }
 
-    public function retryAfter(RequestException $exception): ?int
+    public function failed(\Throwable $e): void
     {
-        return (int) $exception->response->header('Retry-After') ?: null;
+        IntegrationLog::create([
+            'provider_code' => $this->providerCode,
+            'isrc' => $this->isrc,
+            'status' => IntegrationStatus::Failed,
+            'attempt' => $this->attempts(),
+            'markets' => $this->markets,
+            'error_message' => $e->getMessage(),
+            'error_class' => get_class($e),
+            'started_at' => now(),
+            'finished_at' => now(),
+        ]);
+    }
+
+    private function isRateLimited(RequestException $e): bool
+    {
+        return $e->response->status() === Response::HTTP_TOO_MANY_REQUESTS;
+    }
+
+    private function handleRateLimit(RequestException $e): void
+    {
+        $retryAfter = (int) ($e->response->header('Retry-After') ?: self::DEFAULT_RETRY_AFTER_SECONDS);
+
+        Log::warning("Rate limited for ISRC [{$this->isrc}], retrying in {$retryAfter}s");
+
+        $this->release($retryAfter);
     }
 }
